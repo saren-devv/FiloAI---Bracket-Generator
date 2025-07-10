@@ -2,8 +2,12 @@ services:
   - type: web
     name: filo-torneos
     env: python
-    buildCommand: pip install -r requirements_web.txt
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements_web.txt
     startCommand: python app.py
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.7 
+        value: 3.11.7
+      - key: PIP_NO_CACHE_DIR
+        value: "1" 
