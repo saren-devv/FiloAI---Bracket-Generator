@@ -3,7 +3,8 @@ services:
     name: filo-torneos
     env: python
     buildCommand: |
-      pip install --upgrade pip
+      python -m pip install --upgrade pip
+      pip install Flask Flask-CORS
       pip install -r requirements_web.txt
     startCommand: python app.py
     envVars:
