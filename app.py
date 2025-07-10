@@ -5,9 +5,19 @@ Autor: AI Assistant
 Fecha: 2024
 """
 
-from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
-from flask_cors import CORS
+import sys
+import subprocess
 import os
+
+# Intentar importar Flask-CORS, si falla, instalarlo
+try:
+    from flask_cors import CORS
+except ImportError:
+    print("Flask-CORS no encontrado, instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "Flask-CORS"])
+    from flask_cors import CORS
+
+from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
 import tempfile
 import shutil
 from pathlib import Path
