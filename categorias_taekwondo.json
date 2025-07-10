@@ -1,0 +1,194 @@
+{
+  "PRE_INFANTIL": {
+    "EDAD": [
+      4,
+      5
+    ],
+    "NIVEL": [
+      "Festival",
+      "Noveles",
+      "Avanzados"
+    ],
+    "SEXO": [
+      "MASCULINO",
+      "FEMENINO"
+    ],
+    "PESOS": [
+      "-24"
+    ]
+  },
+  "INFANTIL_A": {
+    "EDAD": [
+      6,
+      7
+    ],
+    "NIVEL": [
+      "Festival",
+      "Noveles",
+      "Avanzados"
+    ],
+    "SEXO": [
+      "MASCULINO",
+      "FEMENINO"
+    ],
+    "PESOS": [
+      "-19",
+      "-23",
+      "-27",
+      "-31",
+      "+31"
+    ]
+  },
+  "INFANTIL_B": {
+    "EDAD": [
+      8,
+      9
+    ],
+    "NIVEL": [
+      "Festival",
+      "Noveles",
+      "Intermedios",
+      "Avanzados"
+    ],
+    "SEXO": [
+      "MASCULINO",
+      "FEMENINO"
+    ],
+    "PESOS": [
+      "-21",
+      "-25",
+      "-30",
+      "-35",
+      "+35"
+    ]
+  },
+  "INFANTIL_C": {
+    "EDAD": [
+      10,
+      11
+    ],
+    "NIVEL": [
+      "Festival",
+      "Noveles",
+      "Avanzados"
+    ],
+    "SEXO": [
+      "MASCULINO",
+      "FEMENINO"
+    ],
+    "PESOS": [
+      "-30",
+      "-35",
+      "-40",
+      "-45",
+      "+45"
+    ]
+  },
+  "CADETE": {
+    "EDAD": [
+      12,
+      14
+    ],
+    "NIVEL": [
+      "Festival",
+      "Noveles",
+      "Avanzados"
+    ],
+    "SEXO": {
+      "MASCULINO": [
+        "-33",
+        "-37",
+        "-41",
+        "-45",
+        "-49",
+        "-53",
+        "-57",
+        "-61",
+        "-65",
+        "+65"
+      ],
+      "FEMENINO": [
+        "-29",
+        "-33",
+        "-37",
+        "-41",
+        "-44",
+        "-47",
+        "-51",
+        "-55",
+        "-59",
+        "+59"
+      ]
+    }
+  },
+  "JUVENIL": {
+    "EDAD": [
+      15,
+      17
+    ],
+    "NIVEL": [
+      "Festival",
+      "Noveles",
+      "Avanzados"
+    ],
+    "SEXO": {
+      "MASCULINO": [
+        "-45",
+        "-48",
+        "-51",
+        "-55",
+        "-59",
+        "-63",
+        "-68",
+        "-73",
+        "-78",
+        "+78"
+      ],
+      "FEMENINO": [
+        "-42",
+        "-44",
+        "-46",
+        "-49",
+        "-52",
+        "-55",
+        "-59",
+        "-63",
+        "-68",
+        "+68"
+      ]
+    }
+  },
+  "MAYORES": {
+    "EDAD": [
+      18,
+      100
+    ],
+    "NIVEL": [
+      "Festival",
+      "Noveles",
+      "Avanzados" 
+    ],
+    "SEXO": {
+      "MASCULINO": [
+        "-54",
+        "-58",
+        "-63",
+        "-68",
+        "-74",
+        "-80",
+        "-87",
+        "+87"
+      ],
+      "FEMENINO": [
+        "-46",
+        "-49",
+        "-53",
+        "-57",
+        "-62",
+        "-67",
+        "-73",
+        "+73"
+      ]
+    }
+  }
+}
