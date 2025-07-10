@@ -3,314 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FILO 0.5 - Generador de Torneos Taekwondo</title>
+    <title>MEXXUS ARENA - Generador de Torneos</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --gold: #b89b6a;
+            --gold-light: #e6d3b3;
+            --bg: s#f8f8f8;
+            --white: #fff;
+            --shadow: 0 8px 32px 0 rgba(34, 34, 34, 0.10);
+            --radius: 24px;
+            --primary: #222;
         }
-
+        html, body {
+            height: 100%;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'SF Pro Display', 'Inter', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f8f8f8 60%, #e6d3b3 100%);
             min-height: 100vh;
-            padding: 20px;
+            margin: 0;
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
-
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 480px;
+            margin: 32px 0;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             overflow: hidden;
+            padding-bottom: 32px;
+            width: 100%;
         }
-
         .header {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 30px;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--white);
+            padding: 32px 24px 16px 24px;
+            border-bottom: 1px solid var(--gold-light);
         }
-
+        .header img {
+            width: 120px;
+            height: auto;
+            margin-bottom: 12px;
+        }
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .main-content {
-            padding: 40px;
-        }
-
-        .upload-section {
-            background: #f8f9fa;
-            border: 3px dashed #dee2e6;
-            border-radius: 15px;
-            padding: 40px;
+            font-size: 2.1em;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin: 0 0 8px 0;
             text-align: center;
-            transition: all 0.3s ease;
-            margin-bottom: 30px;
         }
-
+        .header p {
+            font-size: 1.1em;
+            color: #7a6c4d;
+            margin: 0;
+            text-align: center;
+        }
+        .main-content {
+            padding: 24px 18px 0 18px;
+        }
+        .upload-section {
+            background: var(--bg);
+            border: 2.5px dashed var(--gold);
+            border-radius: var(--radius);
+            padding: 32px 12px;
+            text-align: center;
+            margin-bottom: 24px;
+            transition: border-color 0.2s, background 0.2s;
+        }
         .upload-section.dragover {
-            border-color: #ff6b6b;
-            background: #fff5f5;
-            transform: scale(1.02);
+            border-color: var(--gold-light);
+            background: #fdf6e9;
         }
-
         .upload-icon {
-            font-size: 4em;
-            color: #6c757d;
-            margin-bottom: 20px;
+            font-size: 3.2em;
+            color: var(--gold);
+            margin-bottom: 12px;
         }
-
         .upload-text {
-            font-size: 1.3em;
-            color: #495057;
-            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #7a6c4d;
+            margin-bottom: 18px;
         }
-
         .upload-text strong {
-            color: #ff6b6b;
+            color: var(--gold);
         }
-
         .file-input {
             display: none;
         }
-
         .upload-btn {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
+            background: var(--gold);
+            color: var(--white);
             border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1.1em;
+            padding: 12px 28px;
+            border-radius: 999px;
+            font-size: 1em;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px;
+            transition: background 0.2s, box-shadow 0.2s;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px 0 rgba(184,155,106,0.08);
         }
-
         .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255,107,107,0.3);
+            background: #a88a5a;
         }
-
         .file-list {
-            margin-top: 30px;
+            margin-top: 18px;
             text-align: left;
         }
-
         .file-item {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
+            background: var(--white);
+            border: 1.5px solid var(--gold-light);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 8px 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.3s ease;
+            transition: box-shadow 0.2s;
         }
-
         .file-item:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 12px rgba(184,155,106,0.08);
         }
-
         .file-info {
             display: flex;
             align-items: center;
         }
-
         .file-icon {
-            font-size: 1.5em;
-            color: #28a745;
-            margin-right: 15px;
+            font-size: 1.3em;
+            color: var(--gold);
+            margin-right: 12px;
         }
-
         .file-name {
             font-weight: 600;
-            color: #495057;
+            color: var(--primary);
         }
-
         .file-size {
-            color: #6c757d;
-            font-size: 0.9em;
-            margin-left: 10px;
+            color: #b89b6a;
+            font-size: 0.92em;
+            margin-left: 8px;
         }
-
         .remove-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
+            background: #fff;
+            color: #b89b6a;
+            border: 1px solid #e6d3b3;
+            padding: 4px 10px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.95em;
+            transition: background 0.2s, color 0.2s;
         }
-
         .remove-btn:hover {
-            background: #c82333;
+            background: var(--gold);
+            color: #fff;
         }
-
         .process-section {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 24px;
         }
-
         .process-btn {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
+            background: var(--gold);
+            color: var(--white);
             border: none;
-            padding: 20px 40px;
-            border-radius: 50px;
-            font-size: 1.3em;
+            padding: 18px 36px;
+            border-radius: 999px;
+            font-size: 1.15em;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px 0 rgba(184,155,106,0.10);
         }
-
         .process-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(40,167,69,0.3);
+            background: #a88a5a;
         }
-
         .process-btn:disabled {
-            background: #6c757d;
+            background: #e6d3b3;
+            color: #fff;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
-
         .loading {
             display: none;
             text-align: center;
-            margin: 30px 0;
+            margin: 24px 0;
         }
-
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #ff6b6b;
+            border-top: 4px solid var(--gold);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 44px;
+            height: 44px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 16px;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         .results-section {
             display: none;
-            margin-top: 30px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
+            margin-top: 24px;
+            background: var(--bg);
+            border-radius: var(--radius);
+            padding: 24px 12px;
         }
-
         .results-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 18px;
         }
-
         .results-header h3 {
-            color: #28a745;
-            font-size: 1.8em;
-            margin-bottom: 10px;
+            color: var(--gold);
+            font-size: 1.4em;
+            margin-bottom: 6px;
         }
-
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 18px;
         }
-
         .result-card {
-            background: white;
+            background: var(--white);
             border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 16px 10px;
+            box-shadow: 0 2px 8px rgba(184,155,106,0.07);
             text-align: center;
+            border: 1.5px solid var(--gold-light);
         }
-
         .result-card h4 {
-            color: #495057;
-            margin-bottom: 15px;
-        }
-
-        .result-value {
-            font-size: 2em;
-            font-weight: 700;
-            color: #ff6b6b;
+            color: #7a6c4d;
             margin-bottom: 10px;
+            font-size: 1em;
         }
-
+        .result-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 6px;
+        }
         .download-section {
             text-align: center;
         }
-
         .download-btn {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
+            background: var(--gold);
+            color: var(--white);
             border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1.1em;
+            padding: 13px 28px;
+            border-radius: 999px;
+            font-size: 1em;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px;
+            transition: background 0.2s, box-shadow 0.2s;
+            margin: 8px 0;
             text-decoration: none;
             display: inline-block;
+            font-weight: 600;
+            box-shadow: 0 2px 8px 0 rgba(184,155,106,0.08);
         }
-
         .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,123,255,0.3);
+            background: #a88a5a;
         }
-
         .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: #fff3e6;
+            color: #b89b6a;
+            border: 1.5px solid #e6d3b3;
             border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
+            padding: 12px;
+            margin: 16px 0;
             text-align: center;
         }
-
         .success-message {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #f6fbe9;
+            color: #7a6c4d;
+            border: 1.5px solid #e6d3b3;
             border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
+            padding: 12px;
+            margin: 16px 0;
             text-align: center;
         }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2em;
+        @media (max-width: 600px) {
+            .container {
+                max-width: 100vw;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
             }
-            
             .main-content {
-                padding: 20px;
+                padding: 12px 4px 0 4px;
             }
-            
-            .upload-section {
-                padding: 20px;
+            .header {
+                padding: 24px 8px 12px 8px;
             }
-            
             .results-grid {
                 grid-template-columns: 1fr;
             }
@@ -320,13 +307,12 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🥋 FILO 0.5</h1>
+            <img src="/static/mexxus_arena_logo.png" alt="Mexxus Arena Logo" />
             <p>Generador Automático de Torneos de Taekwondo</p>
         </div>
-
         <div class="main-content">
             <div class="upload-section" id="uploadSection">
-                <div class="upload-icon">📁</div>
+                <div class="upload-icon"></div>
                 <div class="upload-text">
                     Arrastra y suelta archivos <strong>Excel</strong> aquí<br>
                     o haz clic para seleccionar archivos
@@ -336,37 +322,30 @@
                     Seleccionar Archivos
                 </button>
             </div>
-
             <div class="file-list" id="fileList"></div>
-
             <div class="process-section">
                 <button class="process-btn" id="processBtn" onclick="processFiles()" disabled>
-                    🚀 Generar Torneo Completo
+                    Generar Torneo Completo
                 </button>
             </div>
-
             <div class="loading" id="loading">
                 <div class="spinner"></div>
                 <p>Procesando archivos... Esto puede tomar unos minutos.</p>
             </div>
-
             <div class="results-section" id="resultsSection">
                 <div class="results-header">
-                    <h3>🎉 ¡Torneo Generado Exitosamente!</h3>
+                    <h3>¡Torneo Generado Exitosamente!</h3>
                     <p>Se han procesado todos los archivos y generado los resultados</p>
                 </div>
-
                 <div class="results-grid" id="resultsGrid"></div>
-
                 <div class="download-section" id="downloadSection">
                     <a class="download-btn" id="downloadAllBtn" href="#">
-                        📦 Descargar Todo (ZIP)
+                        Descargar Todo (ZIP)
                     </a>
                 </div>
             </div>
         </div>
     </div>
-
     <script>
         let uploadedFiles = [];
         let currentTimestamp = null;
@@ -428,7 +407,7 @@
                 
                 fileItem.innerHTML = `
                     <div class="file-info">
-                        <div class="file-icon">📊</div>
+                        <div class="file-icon"></div>
                         <div>
                             <div class="file-name">${file.name}</div>
                             <div class="file-size">${fileSize} MB</div>
@@ -527,19 +506,19 @@
             // Update results grid
             resultsGrid.innerHTML = `
                 <div class="result-card">
-                    <h4>📊 Archivos Procesados</h4>
+                    <h4>Archivos Procesados</h4>
                     <div class="result-value">${result.files_processed}</div>
                 </div>
                 <div class="result-card">
-                    <h4>👥 Participantes</h4>
+                    <h4>Participantes</h4>
                     <div class="result-value">${result.participantes || 0}</div>
                 </div>
                 <div class="result-card">
-                    <h4>🏆 Brackets Generados</h4>
+                    <h4>Brackets Generados</h4>
                     <div class="result-value">${result.brackets || 0}</div>
                 </div>
                 <div class="result-card">
-                    <h4>👤 Participantes Solos</h4>
+                    <h4>Participantes Solos</h4>
                     <div class="result-value">${result.solos || 0}</div>
                 </div>
             `;
@@ -553,4 +532,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
