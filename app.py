@@ -5,17 +5,9 @@ Autor: AI Assistant
 Fecha: 2024
 """
 
-import sys
-import subprocess
 import os
 
-# Intentar importar Flask-CORS, si falla, instalarlo
-try:
-    from flask_cors import CORS
-except ImportError:
-    print("Flask-CORS no encontrado, instalando...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "Flask-CORS"])
-    from flask_cors import CORS
+from flask_cors import CORS
 
 from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
 import tempfile
@@ -53,8 +45,8 @@ config = get_config()
 app.config.from_object(config)
 
 # Crear carpetas si no existen
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(RESULTS_FOLDER, exist_ok=True)
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['RESULTS_FOLDER'], exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
