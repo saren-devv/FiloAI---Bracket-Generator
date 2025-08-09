@@ -1,0 +1,25 @@
+# Requirements for binary-only installation (avoids compilation issues)
+# Use this file if the main requirements fail during build
+
+# Core Flask dependencies
+Flask==3.0.0
+Flask-CORS==4.0.0
+Werkzeug==3.0.1
+
+# HTTP and data processing
+requests==2.31.0
+
+# Data processing (binary-only)
+numpy>=1.26.0,<2.0.0
+pandas>=2.2.0,<3.0.0
+
+# Excel processing
+openpyxl==3.1.2
+
+# PDF generation
+reportlab==4.0.7
+Pillow==10.1.0
+
+# Additional build helpers
+setuptools>=68.0.0
+wheel>=0.41.0

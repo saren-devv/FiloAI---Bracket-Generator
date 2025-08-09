@@ -13,5 +13,9 @@ services:
         value: "production"
       - key: SECRET_KEY
         generateValue: true
+      - key: PIP_USE_PEP517
+        value: "0"
+      - key: PIP_PREFER_BINARY
+        value: "1"
     healthCheckPath: /status
     autoDeploy: true 
