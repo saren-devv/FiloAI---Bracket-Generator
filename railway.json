@@ -6,8 +6,12 @@
   "deploy": {
     "startCommand": "python app.py",
     "healthcheckPath": "/status",
-    "healthcheckTimeout": 100,
+    "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
+  },
+  "variables": {
+    "FLASK_ENV": "production",
+    "PYTHON_VERSION": "3.11.7"
   }
 } 

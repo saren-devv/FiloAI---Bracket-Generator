@@ -1,8 +1,9 @@
-Flask
-Flask-CORS
-requests
-pandas
-openpyxl
-reportlab
-Pillow
-numpy 
+Flask==3.0.0
+Flask-CORS==4.0.0
+requests==2.31.0
+pandas==2.1.4
+openpyxl==3.1.2
+reportlab==4.0.7
+Pillow==10.1.0
+numpy==1.25.2
+Werkzeug==3.0.1 

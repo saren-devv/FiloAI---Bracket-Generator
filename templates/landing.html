@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEXXUS ARENA - Generador de Llaves de Combate</title>
+    <style>
+        :root {
+            --gold: #b89b6a;
+            --gold-light: #e6d3b3;
+            --bg: #f8f8f8;
+            --white: #fff;
+            --shadow: 0 8px 32px 0 rgba(34, 34, 34, 0.10);
+            --radius: 24px;
+            --primary: #222;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+        }
+        
+        body {
+            font-family: 'SF Pro Display', 'Inter', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f8f8f8 60%, #e6d3b3 100%);
+            min-height: 100vh;
+            color: var(--primary);
+            overflow-x: hidden;
+        }
+        
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-logo img {
+            width: 50px;
+            height: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--gold);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .cta-button {
+            background: var(--gold);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(184, 155, 106, 0.3);
+        }
+        
+        .cta-button:hover {
+            background: #a88a5a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 155, 106, 0.4);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px 24px 40px;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero-logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 24px;
+            animation: fadeIn 1.2s ease-out;
+        }
+        
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 48px;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            text-align: center;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: #7a6c4d;
+            margin-bottom: 32px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 48px;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: var(--gold);
+            color: var(--white);
+            padding: 18px 36px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(184, 155, 106, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            background: #a88a5a;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(184, 155, 106, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            padding: 16px 34px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-left: 16px;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gold);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(184, 155, 106, 0.4);
+        }
+        
+
+        
+
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 16px;
+            }
+            
+            .nav-links {
+                gap: 16px;
+            }
+            
+            .nav-link {
+                font-size: 0.9rem;
+            }
+            
+            .cta-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .hero {
+                padding: 100px 16px 40px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-primary {
+                width: 100%;
+                max-width: 280px;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 12px 0;
+            }
+            
+            .nav-logo img {
+                width: 45px;
+            }
+            
+            .nav-links {
+                gap: 12px;
+            }
+            
+            .nav-links {
+                gap: 8px;
+            }
+            
+            .cta-button {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="/static/mexxus_arena_logo.png" alt="Mexxus Arena Logo" />
+            </div>
+            <div class="nav-links">
+                <a href="/generator" class="nav-link">Editor Visual</a>
+                <a href="/upload" class="nav-link">Procesador Clásico</a>
+                <a href="/generator" class="cta-button">Empezar</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <img src="/static/mexxus_arena_logo.png" alt="Mexxus Arena Logo" class="hero-logo" />
+            <h1 class="hero-title">El mejor generador de llaves de combate</h1>
+            <p class="hero-subtitle">Herramientas profesionales para torneos de Taekwondo</p>
+            <p class="hero-description">Elige entre nuestro editor visual interactivo o el procesador clásico de archivos Excel</p>
+            <div class="hero-buttons">
+                <a href="/generator" class="btn-primary">🎨 Editor Visual</a>
+                <a href="/upload" class="btn-secondary">📊 Procesador Clásico</a>
+            </div>
+        </div>
+    </section>
+
+
+
+    <script>
+        // Navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>

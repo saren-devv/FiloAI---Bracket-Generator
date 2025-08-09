@@ -238,7 +238,7 @@ class AgrupadorTaekwondo:
         
         # Buscar columna de sexo
         col_sexo = None
-        for patron in ['sexo', 'genero', 'gender', 'sex']:
+        for patron in ['sexo', 'genero', 'género', 'gender', 'sex']:
             col_sexo = next((c for c in df.columns if patron in c.lower()), None)
             if col_sexo:
                 break
@@ -443,12 +443,12 @@ def load_font(font_type='regular', font_category='names'):
                         return ImageFont.truetype("fonts/Anton-Regular.ttf", 36)
             else:
                 try:
-                    return ImageFont.truetype("arial.ttf", 24)
+                    return ImageFont.truetype("arial.ttf", 32)
                 except:
                     try:
-                        return ImageFont.truetype("Arial.ttf", 24)
+                        return ImageFont.truetype("Arial.ttf", 32)
                     except:
-                        return ImageFont.truetype("fonts/Roboto-VariableFont_wdth,wght.ttf", 24)
+                        return ImageFont.truetype("fonts/Roboto-VariableFont_wdth,wght.ttf", 32)
     except Exception as e:
         print(f"Error loading font: {e}")
         # Fallback to default font
@@ -534,7 +534,7 @@ def mark_positions(image_path, participants, output_path, category_name=None, fo
     """
     # Open image and convert to RGB
     pil_img = Image.open(image_path).convert('RGB')
-    scale_factor = 2  # Double the resolution
+    scale_factor = 4  # Quadruple the resolution for better quality
     high_res_img = pil_img.resize((pil_img.width * scale_factor, pil_img.height * scale_factor), Image.Resampling.LANCZOS)
     draw = ImageDraw.Draw(high_res_img)
     
@@ -644,8 +644,8 @@ def mark_positions(image_path, participants, output_path, category_name=None, fo
     # Convert to RGB before saving
     final_img = final_img.convert('RGB')
     
-    # Save with high quality
-    final_img.save(output_path, format='JPEG', quality=95)
+    # Save with maximum quality
+    final_img.save(output_path, format='PNG', optimize=False)
 
 def generar_bracket_categoria(categoria, participantes, carpeta_salida, plantillas_path="bracket_templates"):
     """Genera un bracket para una categoría específica."""

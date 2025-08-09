@@ -1,1 +1,1 @@
-web: python app.py 
+web: FLASK_ENV=production python app.py 

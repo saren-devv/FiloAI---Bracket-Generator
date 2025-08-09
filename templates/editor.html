@@ -1,0 +1,2963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEXXUS ARENA - Editor Visual de Llaves</title>
+    <style>
+        :root {
+            --gold: #b89b6a;
+            --gold-light: #e6d3b3;
+            --bg: #f8f8f8;
+            --white: #fff;
+            --shadow: 0 8px 32px 0 rgba(34, 34, 34, 0.10);
+            --radius: 24px;
+            --primary: #222;
+            --secondary: #666;
+            --border: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', 'Inter', 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            position: relative;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--primary);
+        }
+
+        .header-logo img {
+            width: 40px;
+            height: auto;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #a88a5a;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+
+        /* Layout principal */
+        .editor-layout {
+            display: flex;
+            height: calc(100vh - 73px);
+        }
+
+        /* Sidebar izquierdo */
+        .sidebar {
+            width: 320px;
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg);
+        }
+
+        .upload-area:hover {
+            border-color: var(--gold);
+            background: rgba(184, 155, 106, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--gold);
+            background: rgba(184, 155, 106, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .categories-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .category-item {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .category-item:hover {
+            background: rgba(184, 155, 106, 0.1);
+            border-color: var(--gold);
+        }
+
+        .category-item.active {
+            background: rgba(184, 155, 106, 0.2);
+            border-color: var(--gold);
+        }
+
+        .category-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .category-count {
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        .participants-list {
+            margin-top: 12px;
+            display: none;
+        }
+
+        .category-item.active .participants-list {
+            display: block;
+        }
+
+        .participant-item {
+            background: white;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 4px 0;
+            font-size: 0.9rem;
+            cursor: grab;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .participant-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .participant-item:active {
+            cursor: grabbing;
+        }
+
+        /* Canvas principal */
+        .canvas-container {
+            flex: 1;
+            background: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-toolbar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+
+        .canvas-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .canvas-info {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            cursor: default;
+        }
+
+        /* Panel de propiedades */
+        .properties-panel {
+            width: 280px;
+            background: var(--white);
+            border-left: 1px solid var(--border);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .properties-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .property-group {
+            margin-bottom: 24px;
+        }
+
+        .property-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .property-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .property-input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        /* Estados de carga */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            color: var(--secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Elementos de bracket en canvas */
+        .bracket-element {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+        }
+
+        .participant-box {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .participant-box:hover {
+            border-color: var(--gold);
+            transform: scale(1.02);
+        }
+
+        .participant-box.selected {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(184, 155, 106, 0.3);
+        }
+
+        .bracket-line {
+            stroke: var(--primary);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .bracket-connector {
+            stroke: var(--secondary);
+            stroke-width: 1;
+            stroke-dasharray: 5,5;
+            fill: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .properties-panel {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+            }
+            
+            .properties-panel {
+                display: none;
+            }
+        }
+
+        /* Estilos para procesamiento de archivo */
+        .processing-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: rgba(184, 155, 106, 0.1);
+            border-radius: 8px;
+            border: 2px dashed var(--gold);
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(184, 155, 106, 0.3);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .file-info {
+            background: rgba(76, 175, 80, 0.1);
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .file-info h4 {
+            margin: 0 0 8px 0;
+            color: #4CAF50;
+            font-size: 14px;
+        }
+
+        .file-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .file-info-label {
+            color: #666;
+        }
+
+        .file-info-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Estilos para el gestor de categorías */
+        .categories-manager {
+            margin-top: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .categories-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+
+        .category-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .category-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .category-item.active {
+            background-color: #e3f2fd;
+            border-left: 4px solid var(--primary);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .category-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .category-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .category-btn:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .category-participant-count {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .add-category-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #28a745;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .add-category-btn:hover {
+            background: #218838;
+        }
+
+        .categories-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .categories-action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #dc3545;
+            background: white;
+            color: #dc3545;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .categories-action-btn:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .categories-manager h4 {
+            margin: 0 0 12px 0;
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .sheets-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .sheet-item {
+            background: rgba(184, 155, 106, 0.1);
+            border: 1px solid var(--gold-light);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sheet-item:hover {
+            background: rgba(184, 155, 106, 0.2);
+            border-color: var(--gold);
+        }
+
+        .sheet-item.active {
+            background: rgba(184, 155, 106, 0.3);
+            border-color: var(--gold);
+            box-shadow: 0 2px 8px rgba(184, 155, 106, 0.3);
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .sheet-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .sheet-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .sheet-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .sheet-btn:hover {
+            background: var(--gold);
+            color: white;
+            border-color: var(--gold);
+        }
+
+        .sheet-category {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+
+        .sheet-participant-count {
+            font-size: 0.75rem;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .add-sheet-btn {
+            background: var(--gold);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .add-sheet-btn:hover {
+            background: #a88a5a;
+            transform: translateY(-1px);
+        }
+
+        .sheets-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .sheets-action-btn {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .sheets-action-btn:hover {
+            background: var(--bg);
+            border-color: var(--gold);
+        }
+
+        .sheets-action-btn.primary {
+            background: var(--gold);
+            color: white;
+            border-color: var(--gold);
+        }
+
+        .sheets-action-btn.primary:hover {
+            background: #a88a5a;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <a href="/" class="header-logo">
+                <img src="/static/mexxus_arena_logo.png" alt="Mexxus Arena Logo">
+                <span class="header-title">Editor Visual de Llaves</span>
+            </a>
+        </div>
+        <div class="header-buttons">
+            <button class="btn btn-secondary" onclick="saveProject()">
+                💾 Guardar
+            </button>
+            <button class="btn btn-secondary" onclick="exportBrackets()">
+                📤 Exportar
+            </button>
+            <button class="btn btn-primary" onclick="generatePDF()">
+                📄 Generar PDF
+            </button>
+            <button class="btn btn-secondary" onclick="testServerConnection()" title="Probar conexión con servidor">
+                🔧 Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Layout principal -->
+    <div class="editor-layout">
+        <!-- Sidebar izquierdo -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Participantes</h2>
+                <div class="file-upload">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">📊</div>
+                        <div class="upload-text">Arrastra tu archivo Excel aquí</div>
+                        <div class="upload-subtext">
+                            <strong>Columnas requeridas:</strong><br>
+                            NOMBRE, APELLIDO, DNI, FECHA NACIMIENTO, GÉNERO, KUP, MODALIDAD (KYORUGUI), PESO, ABREVIATURA<br>
+                            <small>o haz clic para seleccionar</small>
+                        </div>
+                    </div>
+                    <div class="processing-indicator" id="processing-indicator" style="display: none;">
+                        <div class="spinner"></div>
+                        <div>Procesando archivo...</div>
+                    </div>
+                    <div class="file-info" id="file-info" style="display: none;">
+                        <!-- Información del archivo procesado -->
+                    </div>
+                    <input type="file" id="file-input" accept=".xlsx,.xls" />
+                </div>
+            </div>
+            <div class="sidebar-content">
+                <div id="categories-container">
+                    <div class="loading">
+                        <div>Sube un archivo Excel para comenzar</div>
+                    </div>
+                </div>
+                
+                        <!-- Gestor de Categorías -->
+        <div class="categories-manager" id="categories-manager">
+            <h4>📄 Categorías del Torneo</h4>
+            <button class="add-category-btn" onclick="addNewCategory()" style="background: #28a745; margin-bottom: 12px;">
+                ➕ Agregar Categoría
+            </button>
+            <div class="categories-container" id="categories-container">
+                <!-- Las categorías se muestran aquí -->
+            </div>
+            <div class="categories-actions">
+                <button class="categories-action-btn" onclick="clearAllCategories()">
+                    🗑️ Limpiar Todo
+                </button>
+            </div>
+        </div>
+            </div>
+        </div>
+
+        <!-- Canvas principal -->
+        <div class="canvas-container">
+            <div class="canvas-toolbar">
+                <div class="canvas-controls">
+                    <button class="btn btn-secondary" onclick="addBracket()">
+                        ➕ Añadir Bracket
+                    </button>
+                    <button class="btn btn-secondary" onclick="autoArrange()">
+                        📐 Auto-organizar
+                    </button>
+                    <button class="btn btn-secondary" onclick="zoomIn()">
+                        🔍+ Acercar
+                    </button>
+                    <button class="btn btn-secondary" onclick="zoomOut()">
+                        🔍- Alejar
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetZoom()">
+                        🔍 100%
+                    </button>
+                </div>
+                <div class="canvas-info">
+                    <span>Zoom: <span id="zoom-level">100%</span></span>
+                    <span>Brackets: <span id="bracket-count">0</span></span>
+                </div>
+            </div>
+            <svg id="canvas"></svg>
+        </div>
+
+        <!-- Panel de propiedades -->
+        <div class="properties-panel">
+            <h3 class="properties-title">Propiedades</h3>
+            <div id="properties-content">
+                <div class="property-group">
+                    <label class="property-label">Categoría</label>
+                    <input type="text" class="property-input" id="bracket-category" placeholder="Ej: Festival Infantil A Masculino -27">
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">Participantes</label>
+                    <div id="participants-count">0 participantes</div>
+                    <div id="participants-list" style="margin-top: 12px; max-height: 200px; overflow-y: auto;">
+                        <!-- Lista de participantes se llena dinámicamente -->
+                    </div>
+                </div>
+                
+                <div class="property-group">
+                    <button class="btn btn-secondary" onclick="addParticipantManually()" style="width: 100%;">
+                        ➕ Añadir Participante
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentData = null;
+        let selectedBracket = null;
+        let brackets = [];
+        let draggedParticipant = null;
+        let currentZoom = 1;
+        let zoomStep = 0.1;
+        let categories = {}; // Variable global para categorías
+
+        // Variable para categoría activa
+        let activeCategoryName = null;
+
+        // Helper para detectar la URL correcta del API
+        function getApiBaseUrl() {
+            const currentPort = window.location.port;
+            const currentHost = window.location.hostname;
+            
+            console.log(`🌐 Detectando API base URL - Host: ${currentHost}, Puerto: ${currentPort}`);
+            
+            // Si estamos en Live Server u otro puerto que no sea 5000, usar Flask en puerto 5000
+            if (currentPort && currentPort !== '5000') {
+                const flaskUrl = `http://${currentHost}:5000`;
+                console.log(`🔗 Usando Flask URL: ${flaskUrl}`);
+                return flaskUrl;
+            }
+            
+            // Si estamos en Flask directamente, usar ruta relativa
+            console.log(`🔗 Usando ruta relativa (mismo servidor)`);
+            return '';
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEditor();
+            setupEventListeners();
+            initializeSheetsManager();
+            initializeCategoriesManager(); // Inicializar gestor de categorías
+        });
+
+        function initializeEditor() {
+            console.log('🎨 Iniciando Editor Visual de Llaves');
+            setupCanvas();
+            // Inicializar estado del botón "Añadir Bracket"
+            updateAddBracketButton();
+        }
+
+        function initializeCategoriesManager() {
+            console.log('📄 Inicializando gestor de categorías...');
+            // Renderizar estado inicial del gestor de categorías
+            displayCategoriesInManager(categories || {});
+        }
+
+        function setupEventListeners() {
+            // Upload de archivos
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Canvas events
+            const canvas = document.getElementById('canvas');
+            canvas.addEventListener('click', handleCanvasClick);
+            canvas.addEventListener('mousemove', handleCanvasMouseMove);
+        }
+
+        function setupCanvas() {
+            const canvas = document.getElementById('canvas');
+            const container = canvas.parentElement;
+            
+            // Establecer tamaño del canvas
+            canvas.setAttribute('width', container.clientWidth);
+            canvas.setAttribute('height', container.clientHeight);
+            
+            // Redimensionar canvas cuando cambie el tamaño de ventana
+            window.addEventListener('resize', () => {
+                canvas.setAttribute('width', container.clientWidth);
+                canvas.setAttribute('height', container.clientHeight);
+                redrawCanvas();
+            });
+        }
+
+        // Manejo de archivos
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        async function processFile(file) {
+            if (!file.name.match(/\.(xlsx|xls)$/)) {
+                alert('Por favor selecciona un archivo Excel válido (.xlsx o .xls)');
+                return;
+            }
+
+            // Mostrar indicador de carga
+            showLoading('Procesando archivo...');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${getApiBaseUrl()}/api/process-file`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error procesando archivo');
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentData = result;
+                    displayCategories(result.categories);
+                    showFileInfo(result.file_info, result.detected_columns);
+                    generateBracketsFromCategories(result.categories);
+                    console.log('✅ Archivo procesado exitosamente:', result);
+                } else {
+                    throw new Error(result.error || 'Error desconocido');
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Error procesando archivo: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayCategories(categories) {
+            const container = document.getElementById('categories-container');
+            const categoriesList = document.createElement('div');
+            categoriesList.className = 'categories-list';
+
+            Object.entries(categories).forEach(([categoryName, categoryData]) => {
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'category-item';
+                categoryItem.dataset.category = categoryName;
+
+                categoryItem.innerHTML = `
+                    <div class="category-name">${categoryName}</div>
+                    <div class="category-count">${categoryData.count} participantes</div>
+                    <div class="participants-list">
+                        ${categoryData.participants.map(p => `
+                            <div class="participant-item" draggable="true" 
+                                 data-participant='${JSON.stringify(p)}'>
+                                ${p.name}${p.academy ? ` (${p.academy})` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Event listener para expandir/contraer categoría
+                categoryItem.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('participant-item')) {
+                        toggleCategory(categoryItem);
+                    }
+                });
+
+                // Event listeners para participantes
+                const participantItems = categoryItem.querySelectorAll('.participant-item');
+                participantItems.forEach(item => {
+                    item.addEventListener('dragstart', handleParticipantDragStart);
+                    item.addEventListener('dragend', handleParticipantDragEnd);
+                });
+
+                categoriesList.appendChild(categoryItem);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(categoriesList);
+            
+            // Actualizar estado del botón "Añadir Bracket"
+            updateAddBracketButton();
+            
+            // Mostrar categorías en el gestor también
+            displayCategoriesInManager(categories);
+        }
+
+        function toggleCategory(categoryItem) {
+            document.querySelectorAll('.category-item').forEach(item => {
+                if (item !== categoryItem) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            categoryItem.classList.toggle('active');
+        }
+
+        function handleParticipantDragStart(e) {
+            draggedParticipant = JSON.parse(e.target.dataset.participant);
+            e.target.style.opacity = '0.5';
+            console.log('🎯 Arrastrando participante:', draggedParticipant);
+        }
+
+        function handleParticipantDragEnd(e) {
+            e.target.style.opacity = '1';
+            draggedParticipant = null;
+        }
+
+        function handleCanvasClick(e) {
+            const canvas = document.getElementById('canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Verificar si se hizo clic en un bracket existente
+            const clickedBracket = findBracketAtPosition(x, y);
+            
+            if (draggedParticipant && !clickedBracket) {
+                // Crear nuevo bracket si se suelta un participante en área vacía
+                createBracketAt(x, y, draggedParticipant);
+            } else if (draggedParticipant && clickedBracket) {
+                // Añadir participante a bracket existente
+                addParticipantToBracket(clickedBracket, draggedParticipant);
+            } else if (clickedBracket) {
+                // Seleccionar bracket existente
+                selectBracket(clickedBracket);
+            } else {
+                // Deseleccionar brackets si se hace clic en vacío
+                deselectAllBrackets();
+            }
+        }
+
+        function findBracketAtPosition(x, y) {
+            return brackets.find(bracket => {
+                const bx = bracket.position.x;
+                const by = bracket.position.y;
+                
+                // Calcular dimensiones según el tipo de bracket
+                let width, height;
+                if (bracket.participants.length < 2) {
+                    // Bracket simple
+                    width = 270;
+                    height = 100;
+                } else {
+                    // Bracket con líneas dinámicas
+                    const layout = calculateBracketLayout(bracket.participants.length);
+                    width = layout.totalWidth;
+                    height = layout.totalHeight;
+                }
+                
+                return x >= bx - 10 && x <= bx + width && 
+                       y >= by - 40 && y <= by + height;
+            });
+        }
+
+        function addParticipantToBracket(bracket, participant) {
+            // Verificar que el participante no esté ya en el bracket
+            const exists = bracket.participants.some(p => p.name === participant.name);
+            if (!exists) {
+                // Asegurar que el participante tenga la estructura correcta
+                const formattedParticipant = {
+                    name: participant.name || 'Nuevo Participante',
+                    academy: participant.academy || '',
+                    age: participant.age || null,
+                    weight: participant.weight || null,
+                    level: participant.level || null,
+                    gender: participant.gender || null
+                };
+                
+                bracket.participants.push(formattedParticipant);
+                rerenderBracket(bracket);
+                updatePropertiesPanel(bracket);
+                console.log('➕ Participante añadido al bracket:', participant.name);
+            } else {
+                console.log('⚠️ El participante ya está en este bracket');
+            }
+        }
+
+        function editParticipant(bracket, participantIndex) {
+            const participant = bracket.participants[participantIndex];
+            if (!participant) return;
+
+            // Crear modal de edición
+            const modal = createEditModal(participant, (updatedParticipant) => {
+                // Actualizar participante
+                bracket.participants[participantIndex] = updatedParticipant;
+                rerenderBracket(bracket);
+                updatePropertiesPanel(bracket);
+                console.log('✏️ Participante editado:', updatedParticipant.name);
+            });
+
+            document.body.appendChild(modal);
+        }
+
+        function createEditModal(participant, onSave) {
+            // Crear overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            `;
+
+            // Crear modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                min-width: 400px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            `;
+
+            modal.innerHTML = `
+                <h3 style="margin: 0 0 20px 0; color: #222; font-size: 1.2rem;">Editar Participante</h3>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                        Nombre completo:
+                    </label>
+                    <input type="text" id="edit-name" value="${participant.name}" 
+                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                        Abreviación de delegación:
+                    </label>
+                    <input type="text" id="edit-academy" value="${participant.academy || ''}" 
+                           placeholder="Ej: UAEM, UNAM, IPN..." 
+                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                    <small style="color: #666; font-size: 12px;">Aparecerá entre paréntesis después del nombre</small>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button id="cancel-edit" 
+                            style="padding: 10px 20px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Cancelar
+                    </button>
+                    <button id="save-edit" 
+                            style="padding: 10px 20px; border: none; background: #b89b6a; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Guardar
+                    </button>
+                </div>
+            `;
+
+            // Event listeners
+            const nameInput = modal.querySelector('#edit-name');
+            const academyInput = modal.querySelector('#edit-academy');
+            const cancelBtn = modal.querySelector('#cancel-edit');
+            const saveBtn = modal.querySelector('#save-edit');
+
+            // Enfocar el campo de nombre
+            setTimeout(() => nameInput.focus(), 100);
+
+            // Función para cerrar modal
+            const closeModal = () => {
+                overlay.remove();
+            };
+
+            // Función para guardar
+            const saveChanges = () => {
+                const name = nameInput.value.trim();
+                if (!name) {
+                    alert('El nombre no puede estar vacío');
+                    return;
+                }
+
+                const updatedParticipant = {
+                    ...participant,
+                    name: name,
+                    academy: academyInput.value.trim()
+                };
+
+                onSave(updatedParticipant);
+                closeModal();
+            };
+
+            // Event listeners
+            cancelBtn.addEventListener('click', closeModal);
+            saveBtn.addEventListener('click', saveChanges);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeModal();
+            });
+
+            // Enter para guardar, Escape para cancelar
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') saveChanges();
+                if (e.key === 'Escape') closeModal();
+            });
+
+            overlay.appendChild(modal);
+            return overlay;
+        }
+
+        function editCategory(bracket) {
+            // Crear modal simple para editar categoría
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                min-width: 400px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            `;
+
+            modal.innerHTML = `
+                <h3 style="margin: 0 0 20px 0; color: #222; font-size: 1.2rem;">Editar Categoría</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                        Nombre de la categoría:
+                    </label>
+                    <input type="text" id="edit-category" value="${bracket.category || ''}" 
+                           placeholder="Ej: Festival Infantil A Masculino -27"
+                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button id="cancel-category" 
+                            style="padding: 10px 20px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Cancelar
+                    </button>
+                    <button id="save-category" 
+                            style="padding: 10px 20px; border: none; background: #b89b6a; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Guardar
+                    </button>
+                </div>
+            `;
+
+            const categoryInput = modal.querySelector('#edit-category');
+            const cancelBtn = modal.querySelector('#cancel-category');
+            const saveBtn = modal.querySelector('#save-category');
+
+            // Enfocar el campo
+            setTimeout(() => categoryInput.focus(), 100);
+
+            const closeModal = () => overlay.remove();
+
+            const saveChanges = () => {
+                const category = categoryInput.value.trim();
+                if (!category) {
+                    alert('La categoría no puede estar vacía');
+                    return;
+                }
+
+                bracket.category = category;
+                rerenderBracket(bracket);
+                updatePropertiesPanel(bracket);
+                closeModal();
+                console.log('🏷️ Categoría editada:', category);
+            };
+
+            cancelBtn.addEventListener('click', closeModal);
+            saveBtn.addEventListener('click', saveChanges);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeModal();
+            });
+
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') saveChanges();
+                if (e.key === 'Escape') closeModal();
+            });
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+        }
+
+        function handleCanvasMouseMove(e) {
+            // TODO: Manejar movimiento de brackets existentes
+        }
+
+        function createBracketAt(x, y, participant) {
+            // Asegurar que el participante tenga la estructura correcta
+            const formattedParticipant = {
+                name: participant.name || 'Nuevo Participante',
+                academy: participant.academy || '',
+                age: participant.age || null,
+                weight: participant.weight || null,
+                level: participant.level || null,
+                gender: participant.gender || null
+            };
+
+            const bracket = {
+                id: `bracket_${Date.now()}`,
+                name: `Bracket ${brackets.length + 1}`,
+                category: 'Nueva Categoría',
+                participants: [formattedParticipant],
+                position: { x, y },
+                type: 'single_elimination'
+            };
+
+            brackets.push(bracket);
+            renderBracket(bracket);
+            updateBracketCount();
+            
+            console.log('🏆 Bracket creado:', bracket);
+        }
+
+        function renderBracket(bracket) {
+            if (bracket.participants.length < 2) {
+                // Para menos de 2 participantes, mostrar una vista simple
+                renderSimpleBracket(bracket);
+                return;
+            }
+
+            // Para 2 o más participantes, usar plantilla real
+            renderTemplateBracket(bracket);
+        }
+
+        function renderSimpleBracket(bracket) {
+            const canvas = document.getElementById('canvas');
+            
+            // Crear grupo SVG para el bracket
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.setAttribute('id', bracket.id);
+            group.setAttribute('transform', `translate(${bracket.position.x}, ${bracket.position.y})`);
+            group.classList.add('bracket-element');
+
+            const participantHeight = 40;
+            const participantWidth = 250;
+            const headerHeight = 30;
+
+            // Crear rectángulo de fondo
+            const background = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            background.setAttribute('x', -10);
+            background.setAttribute('y', -headerHeight);
+            background.setAttribute('width', participantWidth + 20);
+            background.setAttribute('height', participantHeight + headerHeight + 20);
+            background.setAttribute('fill', 'rgba(255, 255, 255, 0.95)');
+            background.setAttribute('stroke', '#e0e0e0');
+            background.setAttribute('stroke-width', '2');
+            background.setAttribute('rx', '8');
+            background.setAttribute('class', 'bracket-background');
+            group.appendChild(background);
+
+            // Título del bracket
+            const titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            titleText.setAttribute('x', participantWidth / 2);
+            titleText.setAttribute('y', -10);
+            titleText.setAttribute('text-anchor', 'middle');
+            titleText.setAttribute('font-family', 'SF Pro Display, Inter, Segoe UI, Arial, sans-serif');
+            titleText.setAttribute('font-size', '12');
+            titleText.setAttribute('font-weight', '700');
+            titleText.setAttribute('fill', '#b89b6a');
+            titleText.textContent = bracket.category || 'Nueva Categoría';
+            
+            // Añadir doble clic para editar categoría
+            titleText.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                editCategory(bracket);
+            });
+            titleText.style.cursor = 'pointer';
+            
+            group.appendChild(titleText);
+
+            // Participante (solo para vista previa)
+            if (bracket.participants.length > 0) {
+                renderParticipantElement(group, bracket.participants[0], 0, 0, 0, participantWidth, participantHeight, bracket);
+            }
+
+            setupBracketEvents(group, bracket);
+            canvas.appendChild(group);
+        }
+
+        function renderTemplateBracket(bracket) {
+            const canvas = document.getElementById('canvas');
+            
+            // Crear grupo SVG para el bracket
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.setAttribute('id', bracket.id);
+            group.setAttribute('transform', `translate(${bracket.position.x}, ${bracket.position.y})`);
+            group.classList.add('bracket-element');
+
+            const participantCount = bracket.participants.length;
+            
+            // Calcular layout del bracket
+            const layout = calculateBracketLayout(participantCount);
+            
+            // Título del bracket
+            const titleBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            titleBg.setAttribute('x', 0);
+            titleBg.setAttribute('y', -40);
+            titleBg.setAttribute('width', layout.totalWidth);
+            titleBg.setAttribute('height', 35);
+            titleBg.setAttribute('fill', 'rgba(184, 155, 106, 0.9)');
+            titleBg.setAttribute('rx', '8');
+            group.appendChild(titleBg);
+
+            const titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            titleText.setAttribute('x', layout.totalWidth / 2);
+            titleText.setAttribute('y', -15);
+            titleText.setAttribute('text-anchor', 'middle');
+            titleText.setAttribute('font-family', 'SF Pro Display, Inter, Segoe UI, Arial, sans-serif');
+            titleText.setAttribute('font-size', '16');
+            titleText.setAttribute('font-weight', '700');
+            titleText.setAttribute('fill', 'white');
+            titleText.textContent = bracket.category || 'Nueva Categoría';
+            
+            // Añadir doble clic para editar categoría
+            titleText.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                editCategory(bracket);
+            });
+            titleText.style.cursor = 'pointer';
+            
+            group.appendChild(titleText);
+
+            // Renderizar participantes en la primera ronda
+            bracket.participants.forEach((participant, index) => {
+                const pos = layout.participantPositions[index];
+                if (pos) {
+                    renderParticipantElement(group, participant, index, pos.x, pos.y, 180, 35, bracket);
+                }
+            });
+
+            // Dibujar líneas de eliminación
+            drawEliminationLines(group, layout);
+
+            setupBracketEvents(group, bracket);
+            canvas.appendChild(group);
+        }
+
+        function calculateBracketLayout(participantCount) {
+            const participantWidth = 180;
+            const participantHeight = 35;
+            const verticalSpacing = 20;
+            const horizontalSpacing = 120;
+            
+            // Calcular ancho total simple
+            const totalWidth = participantWidth + horizontalSpacing + 100; // Espacio para líneas
+            
+            // Posiciones de participantes en la primera ronda
+            const participantPositions = [];
+            
+            for (let i = 0; i < participantCount; i++) {
+                participantPositions.push({
+                    x: 20,
+                    y: 20 + i * (participantHeight + verticalSpacing)
+                });
+            }
+
+            const totalHeight = participantCount * (participantHeight + verticalSpacing) + 40;
+
+            return {
+                totalWidth,
+                totalHeight,
+                participantPositions,
+                participantWidth,
+                participantHeight,
+                verticalSpacing,
+                horizontalSpacing
+            };
+        }
+
+        function drawEliminationLines(group, layout) {
+            const lineColor = '#b89b6a';
+            const lineWidth = 2;
+            const participantCount = layout.participantPositions.length;
+            
+            // Solo dibujar las líneas mínimas necesarias para conectar participantes
+            if (participantCount >= 2) {
+                // Calcular las líneas básicas según el número de participantes
+                drawBasicConnections(group, layout, lineColor, lineWidth);
+            }
+        }
+
+        function drawBasicConnections(group, layout, color, width) {
+            const participants = layout.participantPositions;
+            const participantCount = participants.length;
+            
+            // Para 2 participantes: una línea simple conectándolos
+            if (participantCount === 2) {
+                const p1 = participants[0];
+                const p2 = participants[1];
+                
+                // Líneas horizontales desde cada participante
+                const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line1.setAttribute('x1', p1.x + layout.participantWidth);
+                line1.setAttribute('y1', p1.y + layout.participantHeight / 2);
+                line1.setAttribute('x2', p1.x + layout.participantWidth + 40);
+                line1.setAttribute('y2', p1.y + layout.participantHeight / 2);
+                line1.setAttribute('stroke', color);
+                line1.setAttribute('stroke-width', width);
+                group.appendChild(line1);
+
+                const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line2.setAttribute('x1', p2.x + layout.participantWidth);
+                line2.setAttribute('y1', p2.y + layout.participantHeight / 2);
+                line2.setAttribute('x2', p2.x + layout.participantWidth + 40);
+                line2.setAttribute('y2', p2.y + layout.participantHeight / 2);
+                line2.setAttribute('stroke', color);
+                line2.setAttribute('stroke-width', width);
+                group.appendChild(line2);
+
+                // Línea vertical conectora
+                const line3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line3.setAttribute('x1', p1.x + layout.participantWidth + 40);
+                line3.setAttribute('y1', p1.y + layout.participantHeight / 2);
+                line3.setAttribute('x2', p1.x + layout.participantWidth + 40);
+                line3.setAttribute('y2', p2.y + layout.participantHeight / 2);
+                line3.setAttribute('stroke', color);
+                line3.setAttribute('stroke-width', width);
+                group.appendChild(line3);
+
+                // Línea hacia el ganador
+                const midY = (p1.y + p2.y) / 2 + layout.participantHeight / 2;
+                const line4 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line4.setAttribute('x1', p1.x + layout.participantWidth + 40);
+                line4.setAttribute('y1', midY);
+                line4.setAttribute('x2', p1.x + layout.participantWidth + 120);
+                line4.setAttribute('y2', midY);
+                line4.setAttribute('stroke', color);
+                line4.setAttribute('stroke-width', width);
+                group.appendChild(line4);
+            }
+            // Para 3 participantes: dos líneas conectadas, una directa
+            else if (participantCount === 3) {
+                // Los dos primeros se conectan
+                const p1 = participants[0];
+                const p2 = participants[1];
+                const p3 = participants[2];
+                
+                // Match entre p1 y p2
+                drawSimpleMatch(group, p1, p2, layout, color, width);
+                
+                // Línea directa para p3 (bye)
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', p3.x + layout.participantWidth);
+                line.setAttribute('y1', p3.y + layout.participantHeight / 2);
+                line.setAttribute('x2', p3.x + layout.participantWidth + 120);
+                line.setAttribute('y2', p3.y + layout.participantHeight / 2);
+                line.setAttribute('stroke', color);
+                line.setAttribute('stroke-width', width);
+                group.appendChild(line);
+            }
+            // Para 4 o más participantes: sistema de matches por pares
+            else {
+                drawMultipleMatches(group, participants, layout, color, width);
+            }
+        }
+
+        function drawSimpleMatch(group, p1, p2, layout, color, width) {
+            // Líneas horizontales
+            const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line1.setAttribute('x1', p1.x + layout.participantWidth);
+            line1.setAttribute('y1', p1.y + layout.participantHeight / 2);
+            line1.setAttribute('x2', p1.x + layout.participantWidth + 40);
+            line1.setAttribute('y2', p1.y + layout.participantHeight / 2);
+            line1.setAttribute('stroke', color);
+            line1.setAttribute('stroke-width', width);
+            group.appendChild(line1);
+
+            const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line2.setAttribute('x1', p2.x + layout.participantWidth);
+            line2.setAttribute('y1', p2.y + layout.participantHeight / 2);
+            line2.setAttribute('x2', p2.x + layout.participantWidth + 40);
+            line2.setAttribute('y2', p2.y + layout.participantHeight / 2);
+            line2.setAttribute('stroke', color);
+            line2.setAttribute('stroke-width', width);
+            group.appendChild(line2);
+
+            // Línea vertical
+            const line3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line3.setAttribute('x1', p1.x + layout.participantWidth + 40);
+            line3.setAttribute('y1', p1.y + layout.participantHeight / 2);
+            line3.setAttribute('x2', p1.x + layout.participantWidth + 40);
+            line3.setAttribute('y2', p2.y + layout.participantHeight / 2);
+            line3.setAttribute('stroke', color);
+            line3.setAttribute('stroke-width', width);
+            group.appendChild(line3);
+
+            // Línea hacia siguiente ronda
+            const midY = (p1.y + p2.y) / 2 + layout.participantHeight / 2;
+            const line4 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line4.setAttribute('x1', p1.x + layout.participantWidth + 40);
+            line4.setAttribute('y1', midY);
+            line4.setAttribute('x2', p1.x + layout.participantWidth + 120);
+            line4.setAttribute('y2', midY);
+            line4.setAttribute('stroke', color);
+            line4.setAttribute('stroke-width', width);
+            group.appendChild(line4);
+        }
+
+        function drawMultipleMatches(group, participants, layout, color, width) {
+            // Dibujar matches por pares simples
+            for (let i = 0; i < participants.length - 1; i += 2) {
+                const p1 = participants[i];
+                const p2 = participants[i + 1];
+                
+                if (p2) {
+                    // Match normal
+                    drawSimpleMatch(group, p1, p2, layout, color, width);
+                } else {
+                    // Bye - línea directa
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', p1.x + layout.participantWidth);
+                    line.setAttribute('y1', p1.y + layout.participantHeight / 2);
+                    line.setAttribute('x2', p1.x + layout.participantWidth + 120);
+                    line.setAttribute('y2', p1.y + layout.participantHeight / 2);
+                    line.setAttribute('stroke', color);
+                    line.setAttribute('stroke-width', width);
+                    group.appendChild(line);
+                }
+            }
+        }
+
+
+
+
+
+
+
+        function renderParticipantElement(group, participant, index, x, y, width, height, bracket) {
+            // Debug: validar parámetros
+            console.log('renderParticipantElement params:', {group, participant, index, x, y, width, height, bracket});
+            
+            // Validar que width y height sean números
+            if (typeof width !== 'number' || typeof height !== 'number') {
+                console.error('❌ width o height no son números:', {width, height});
+                return;
+            }
+            
+            // Rectángulo del participante
+            const participantRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            participantRect.setAttribute('x', x);
+            participantRect.setAttribute('y', y);
+            participantRect.setAttribute('width', width);
+            participantRect.setAttribute('height', height);
+            participantRect.setAttribute('fill', 'rgba(255, 255, 255, 0.95)');
+            participantRect.setAttribute('stroke', '#b89b6a');
+            participantRect.setAttribute('stroke-width', '2');
+            participantRect.setAttribute('rx', '6');
+            participantRect.setAttribute('class', 'participant-rect');
+            participantRect.dataset.participantIndex = index;
+
+            // Texto del participante (nombre + abreviación)
+            const participantText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            participantText.setAttribute('x', x + width / 2);
+            participantText.setAttribute('y', y + height / 2 + 5);
+            participantText.setAttribute('text-anchor', 'middle');
+            participantText.setAttribute('font-family', 'SF Pro Display, Inter, Segoe UI, Arial, sans-serif');
+            participantText.setAttribute('font-size', '12');
+            participantText.setAttribute('font-weight', '600');
+            participantText.setAttribute('fill', '#222');
+            participantText.setAttribute('class', 'participant-text');
+            participantText.dataset.participantIndex = index;
+
+            // Formatear nombre con abreviación - manejar diferentes estructuras de datos
+            let displayText = '';
+            
+            if (typeof participant === 'string') {
+                // Si el participante es un string simple
+                displayText = participant;
+            } else if (participant && typeof participant === 'object') {
+                // Si el participante es un objeto
+                displayText = participant.name || 'Participante sin nombre';
+                if (participant.academy && participant.academy.trim()) {
+                    displayText += ` (${participant.academy})`;
+                }
+            } else {
+                // Fallback para casos inesperados
+                displayText = 'Participante';
+            }
+            
+            // Truncar si es muy largo
+            if (displayText && displayText.length > 22) {
+                displayText = displayText.substring(0, 19) + '...';
+            }
+            participantText.textContent = displayText || 'Participante';
+
+
+
+            // Botón de eliminar
+            const removeBtn = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            removeBtn.setAttribute('cx', x + width - 15);
+            removeBtn.setAttribute('cy', y + height - 12);
+            removeBtn.setAttribute('r', '8');
+            removeBtn.setAttribute('fill', '#ff4757');
+            removeBtn.setAttribute('class', 'remove-participant-btn');
+            removeBtn.style.cursor = 'pointer';
+            removeBtn.dataset.participantIndex = index;
+
+            const removeIcon = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            removeIcon.setAttribute('x', x + width - 15);
+            removeIcon.setAttribute('y', y + height - 8);
+            removeIcon.setAttribute('text-anchor', 'middle');
+            removeIcon.setAttribute('font-size', '10');
+            removeIcon.setAttribute('fill', 'white');
+            removeIcon.setAttribute('font-weight', 'bold');
+            removeIcon.textContent = '×';
+            removeIcon.style.pointerEvents = 'none';
+
+            // Event listeners
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeParticipantFromBracket(bracket, index);
+            });
+
+            // Doble clic en texto para editar
+            participantText.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                editParticipant(bracket, index);
+            });
+
+            // Doble clic en rectángulo también para editar
+            participantRect.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                editParticipant(bracket, index);
+            });
+
+            group.appendChild(participantRect);
+            group.appendChild(participantText);
+            group.appendChild(removeBtn);
+            group.appendChild(removeIcon);
+        }
+
+        function setupBracketEvents(group, bracket) {
+            // Event listeners para el bracket
+            group.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('remove-participant-btn') && 
+                    !e.target.classList.contains('edit-participant-btn')) {
+                    e.stopPropagation();
+                    selectBracket(bracket);
+                }
+            });
+
+            // Hacer el bracket arrastrable
+            makeBracketDraggable(group, bracket);
+        }
+
+
+
+        function rerenderBracket(bracket) {
+            // Eliminar el bracket existente del DOM
+            const existingElement = document.getElementById(bracket.id);
+            if (existingElement) {
+                existingElement.remove();
+            }
+            
+            // Volver a renderizar
+            renderBracket(bracket);
+            
+            // Mantener selección si era el bracket seleccionado
+            if (selectedBracket && selectedBracket.id === bracket.id) {
+                selectBracket(bracket);
+            }
+        }
+
+        function removeParticipantFromBracket(bracket, participantIndex) {
+            if (bracket.participants.length > 1) {
+                bracket.participants.splice(participantIndex, 1);
+                rerenderBracket(bracket);
+                updatePropertiesPanel(bracket);
+                console.log('➖ Participante eliminado del bracket');
+            } else {
+                // Si solo queda un participante, eliminar todo el bracket
+                removeBracket(bracket);
+            }
+        }
+
+        function removeBracket(bracket) {
+            const index = brackets.findIndex(b => b.id === bracket.id);
+            if (index !== -1) {
+                brackets.splice(index, 1);
+                const element = document.getElementById(bracket.id);
+                if (element) {
+                    element.remove();
+                }
+                updateBracketCount();
+                deselectAllBrackets();
+                console.log('🗑️ Bracket eliminado');
+            }
+        }
+
+        function makeBracketDraggable(group, bracket) {
+            let isDragging = false;
+            let startX, startY;
+
+            group.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('remove-participant-btn')) return;
+                
+                isDragging = true;
+                startX = e.clientX - bracket.position.x;
+                startY = e.clientY - bracket.position.y;
+                group.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                bracket.position.x = e.clientX - startX;
+                bracket.position.y = e.clientY - startY;
+                group.setAttribute('transform', `translate(${bracket.position.x}, ${bracket.position.y})`);
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    group.style.cursor = 'grab';
+                }
+            });
+        }
+
+        function selectBracket(bracket) {
+            deselectAllBrackets();
+            selectedBracket = bracket;
+            
+            // Resaltar bracket seleccionado
+            const bracketElement = document.getElementById(bracket.id);
+            if (bracketElement) {
+                const background = bracketElement.querySelector('rect');
+                background.setAttribute('stroke', '#b89b6a');
+                background.setAttribute('stroke-width', '3');
+            }
+
+            // Actualizar panel de propiedades
+            updatePropertiesPanel(bracket);
+        }
+
+        function deselectAllBrackets() {
+            selectedBracket = null;
+            brackets.forEach(bracket => {
+                const bracketElement = document.getElementById(bracket.id);
+                if (bracketElement) {
+                    const background = bracketElement.querySelector('rect');
+                    background.setAttribute('stroke', '#e0e0e0');
+                    background.setAttribute('stroke-width', '2');
+                }
+            });
+            clearPropertiesPanel();
+        }
+
+        function updatePropertiesPanel(bracket) {
+            document.getElementById('bracket-category').value = bracket.category;
+            document.getElementById('participants-count').textContent = `${bracket.participants.length} participantes`;
+            
+            // Actualizar lista de participantes
+            updateParticipantsList(bracket);
+            
+            // Añadir event listeners para edición en tiempo real
+            setupPropertiesListeners(bracket);
+        }
+
+        function updateParticipantsList(bracket) {
+            const participantsList = document.getElementById('participants-list');
+            
+            if (bracket.participants.length === 0) {
+                participantsList.innerHTML = '<div style="color: #999; font-style: italic; font-size: 13px;">No hay participantes</div>';
+                return;
+            }
+
+            participantsList.innerHTML = bracket.participants.map((participant, index) => {
+                const displayName = participant.academy ? 
+                    `${participant.name} (${participant.academy})` : 
+                    participant.name;
+                    
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f8f8; border-radius: 6px; margin-bottom: 4px; font-size: 13px;">
+                        <span style="flex: 1; margin-right: 8px;">${displayName}</span>
+                        <div style="display: flex; gap: 4px;">
+                            <button onclick="removeParticipantFromBracket(selectedBracket, ${index})" 
+                                    style="background: #ff4757; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 11px;">
+                                ×
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addParticipantManually() {
+            if (!selectedBracket) {
+                alert('Selecciona un bracket primero');
+                return;
+            }
+
+            const participant = {
+                name: 'Nuevo Participante',
+                academy: '',
+                age: null,
+                weight: null,
+                level: null,
+                gender: null
+            };
+
+            // Abrir directamente el modal de edición
+            const modal = createEditModal(participant, (updatedParticipant) => {
+                selectedBracket.participants.push(updatedParticipant);
+                rerenderBracket(selectedBracket);
+                updatePropertiesPanel(selectedBracket);
+                console.log('➕ Participante añadido manualmente:', updatedParticipant.name);
+            });
+
+            document.body.appendChild(modal);
+        }
+
+        function setupPropertiesListeners(bracket) {
+            // Edición de categoría
+            const categoryInput = document.getElementById('bracket-category');
+
+            // Remover listeners anteriores
+            categoryInput.removeEventListener('input', categoryInput._currentListener);
+
+            // Crear nuevos listeners
+            categoryInput._currentListener = (e) => {
+                bracket.category = e.target.value;
+                rerenderBracket(bracket);
+            };
+
+            // Añadir listeners
+            categoryInput.addEventListener('input', categoryInput._currentListener);
+        }
+
+        function clearPropertiesPanel() {
+            document.getElementById('bracket-category').value = '';
+            document.getElementById('participants-count').textContent = '0 participantes';
+            document.getElementById('participants-list').innerHTML = '<div style="color: #999; font-style: italic; font-size: 13px;">Selecciona un bracket para ver participantes</div>';
+        }
+
+        function redrawCanvas() {
+            const canvas = document.getElementById('canvas');
+            canvas.innerHTML = '';
+            brackets.forEach(renderBracket);
+        }
+
+        function updateBracketCount() {
+            document.getElementById('bracket-count').textContent = brackets.length;
+        }
+
+        function updateAddBracketButton() {
+            const addBracketBtn = document.querySelector('button[onclick="addBracket()"]');
+            const hasCategories = categories && Object.keys(categories).length > 0;
+            
+            if (addBracketBtn) {
+                if (hasCategories) {
+                    addBracketBtn.disabled = false;
+                    addBracketBtn.style.opacity = '1';
+                    addBracketBtn.style.cursor = 'pointer';
+                    addBracketBtn.title = 'Añadir nuevo bracket';
+                } else {
+                    addBracketBtn.disabled = true;
+                    addBracketBtn.style.opacity = '0.5';
+                    addBracketBtn.style.cursor = 'not-allowed';
+                    addBracketBtn.title = 'Importa Excel o crea categorías primero';
+                }
+            }
+        }
+
+        function displayCategoriesInManager(categories) {
+            const container = document.getElementById('categories-container');
+            
+            if (!container) {
+                console.error('❌ No se encontró el contenedor del gestor');
+                return;
+            }
+            
+            console.log(`📄 Mostrando ${Object.keys(categories).length} categorías en el gestor`);
+            
+            if (Object.keys(categories).length === 0) {
+                container.innerHTML = '<div style="color: #999; font-style: italic; text-align: center; padding: 20px;">No hay categorías</div>';
+                return;
+            }
+
+            container.innerHTML = Object.entries(categories).map(([categoryName, categoryData]) => `
+                <div class="category-item ${categoryName === activeCategoryName ? 'active' : ''}" 
+                     data-category-name="${categoryName}" 
+                     onclick="selectCategory('${categoryName}')">
+                    <div class="category-header">
+                        <div class="category-name">${categoryName}</div>
+                        <div class="category-controls">
+                            <button class="category-btn" onclick="editCategory('${categoryName}'); event.stopPropagation();" title="Editar">✏️</button>
+                            <button class="category-btn" onclick="deleteCategory('${categoryName}'); event.stopPropagation();" title="Eliminar">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="category-participant-count">${categoryData.participants.length} participantes</div>
+                </div>
+            `).join('');
+            
+            console.log(`✅ ${Object.keys(categories).length} categorías mostradas en el gestor`);
+        }
+
+
+
+        function showLoading(message) {
+            const container = document.getElementById('categories-container');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+
+        function hideLoading() {
+            // Se actualiza automáticamente cuando se cargan las categorías
+        }
+
+        // Funciones de botones
+        function selectCategory(categoryName) {
+            activeCategoryName = categoryName;
+            displayCategoriesInManager(categories);
+            
+            const categoryData = categories[categoryName];
+            if (categoryData) {
+                // Limpiar canvas y mostrar bracket para esta categoría
+                clearCanvas();
+                brackets = [];
+                
+                // Crear un bracket automáticamente para la categoría seleccionada
+                const bracket = {
+                    id: `bracket_${Date.now()}`,
+                    name: categoryName,
+                    category: categoryName,
+                    participants: categoryData.participants,
+                    position: { x: 100, y: 100 },
+                    type: 'single_elimination'
+                };
+                
+                brackets.push(bracket);
+                renderBracket(bracket);
+                updateBracketCount();
+                
+                console.log('📄 Categoría seleccionada:', categoryName);
+            }
+        }
+
+        function editCategory(categoryName) {
+            // TODO: Implementar edición de categoría
+            alert('Editar categoría: ' + categoryName + '\n\nFuncionalidad próximamente');
+        }
+
+        function deleteCategory(categoryName) {
+            if (confirm(`¿Estás seguro de que quieres eliminar la categoría "${categoryName}"?`)) {
+                delete categories[categoryName];
+                displayCategories(categories);
+                displayCategoriesInManager(categories);
+                updateAddBracketButton();
+                
+                if (activeCategoryName === categoryName) {
+                    activeCategoryName = null;
+                    clearCanvas();
+                    brackets = [];
+                    updateBracketCount();
+                }
+                
+                console.log('🗑️ Categoría eliminada:', categoryName);
+            }
+        }
+
+        function clearAllCategories() {
+            if (!categories || Object.keys(categories).length === 0) {
+                alert('No hay categorías para limpiar');
+                return;
+            }
+
+            if (confirm(`¿Estás seguro de que quieres eliminar todas las ${Object.keys(categories).length} categorías?`)) {
+                categories = {};
+                activeCategoryName = null;
+                clearCanvas();
+                brackets = [];
+                updateBracketCount();
+                displayCategories(categories);
+                displayCategoriesInManager(categories);
+                updateAddBracketButton();
+                
+                console.log('🗑️ Todas las categorías eliminadas');
+            }
+        }
+
+        function addNewCategory() {
+            // Mostrar modal para crear una nueva categoría personalizada
+            showNewCategoryModal();
+        }
+
+        function showNewCategoryModal() {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                min-width: 400px;
+                max-width: 450px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            `;
+
+            modal.innerHTML = `
+                <h3 style="margin: 0 0 20px 0; color: #222; font-size: 1.2rem;">➕ Crear Nueva Categoría</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                        Nombre de la categoría:
+                    </label>
+                    <input type="text" id="new-category-name" placeholder="Ej: Festival Infantil A Masculino -30" 
+                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                    <small style="color: #666; font-size: 12px; margin-top: 6px; display: block;">
+                        Se creará automáticamente con 2 participantes por defecto
+                    </small>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button id="cancel-new-category" 
+                            style="padding: 10px 20px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Cancelar
+                    </button>
+                    <button id="create-new-category" 
+                            style="padding: 10px 20px; border: none; background: #28a745; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Crear Categoría
+                    </button>
+                </div>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            // Referencias a elementos
+            const categoryNameInput = document.getElementById('new-category-name');
+            const cancelBtn = document.getElementById('cancel-new-category');
+            const createBtn = document.getElementById('create-new-category');
+
+            // Función para cerrar modal
+            const closeModal = () => {
+                document.body.removeChild(overlay);
+            };
+
+            // Event listeners
+            cancelBtn.addEventListener('click', closeModal);
+            
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeModal();
+            });
+
+            // Función para crear categoría
+            const createCategory = () => {
+                const categoryName = categoryNameInput.value.trim();
+                if (!categoryName) {
+                    alert('Por favor ingresa un nombre para la categoría');
+                    return;
+                }
+
+                // Verificar si ya existe
+                if (categories && categories[categoryName]) {
+                    alert('Ya existe una categoría con ese nombre');
+                    return;
+                }
+
+                // Crear participantes por defecto
+                const defaultParticipants = [
+                    { 
+                        name: 'Participante 1', 
+                        academy: '', 
+                        age: null, 
+                        weight: null, 
+                        level: null, 
+                        gender: null,
+                        document: ''
+                    },
+                    { 
+                        name: 'Participante 2', 
+                        academy: '', 
+                        age: null, 
+                        weight: null, 
+                        level: null, 
+                        gender: null,
+                        document: ''
+                    }
+                ];
+
+                // Inicializar categories si no existe
+                if (!categories) {
+                    categories = {};
+                }
+
+                // Crear nueva categoría
+                categories[categoryName] = {
+                    name: categoryName,
+                    participants: defaultParticipants,
+                    count: 2
+                };
+
+                // Actualizar UI
+                displayCategories(categories);
+                displayCategoriesInManager(categories);
+                updateAddBracketButton();
+
+                console.log('✅ Nueva categoría creada:', categoryName);
+                closeModal();
+            };
+
+            createBtn.addEventListener('click', createCategory);
+
+            // Enter para crear
+            categoryNameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    createCategory();
+                }
+            });
+
+            // Enfocar input
+            setTimeout(() => categoryNameInput.focus(), 100);
+        }
+
+        function addBracket() {
+            // Verificar si hay categorías disponibles
+            const hasCategories = categories && Object.keys(categories).length > 0;
+            
+            if (!hasCategories) {
+                alert('❌ No hay categorías disponibles.\n\n' +
+                      'Para añadir brackets:\n' +
+                      '• Importa un archivo Excel con participantes\n' +
+                      '• O crea categorías con "➕ Agregar Categoría"');
+                return;
+            }
+            
+            const canvas = document.getElementById('canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = rect.width / 2;
+            const y = rect.height / 2;
+            
+            // Crear bracket con 2 participantes por defecto
+            const participant1 = {
+                name: 'Participante 1',
+                academy: '',
+                age: null,
+                weight: null,
+                level: null,
+                gender: null
+            };
+
+            const participant2 = {
+                name: 'Participante 2',
+                academy: '',
+                age: null,
+                weight: null,
+                level: null,
+                gender: null
+            };
+
+            const bracket = {
+                id: `bracket_${Date.now()}`,
+                name: `Bracket ${brackets.length + 1}`,
+                category: 'Nueva Categoría',
+                participants: [participant1, participant2],
+                position: { x, y },
+                type: 'single_elimination'
+            };
+
+            brackets.push(bracket);
+            renderBracket(bracket);
+            updateBracketCount();
+            
+            console.log('🏆 Bracket creado con 2 participantes:', bracket);
+        }
+
+        function autoArrange() {
+            if (brackets.length === 0) {
+                console.log('⚠️ No hay brackets para organizar');
+                return;
+            }
+
+            console.log('🔄 Auto-organizando brackets verticalmente...');
+            
+            const startX = 50; // Posición X fija para todos
+            let currentY = 50; // Posición Y inicial
+            const bracketSpacing = 100; // Espacio entre brackets
+            
+            brackets.forEach((bracket, index) => {
+                bracket.position.x = startX;
+                bracket.position.y = currentY;
+                
+                const element = document.getElementById(bracket.id);
+                if (element) {
+                    element.setAttribute('transform', `translate(${bracket.position.x}, ${bracket.position.y})`);
+                }
+                
+                // Calcular la altura del bracket actual para el siguiente
+                const bracketHeight = calculateBracketHeight(bracket);
+                currentY += bracketHeight + bracketSpacing;
+            });
+            
+            console.log(`✅ ${brackets.length} brackets organizados verticalmente con espaciado dinámico`);
+        }
+
+        function calculateBracketHeight(bracket) {
+            const participantCount = bracket.participants.length;
+            
+            if (participantCount <= 1) {
+                // Bracket simple
+                return 80; // Altura básica para 1 participante o menos
+            } else if (participantCount === 2) {
+                // 2 participantes en línea directa
+                return 120;
+            } else if (participantCount === 3) {
+                // 3 participantes (2 + bye)
+                return 150;
+            } else {
+                // 4 o más participantes - calcular según rondas
+                const rounds = Math.ceil(Math.log2(participantCount));
+                const participantHeight = 40;
+                const verticalSpacing = 20;
+                
+                // La altura depende del número de participantes en la primera ronda
+                const firstRoundParticipants = Math.pow(2, rounds);
+                const totalHeight = (firstRoundParticipants * participantHeight) + 
+                                  ((firstRoundParticipants - 1) * verticalSpacing) + 
+                                  60; // Espacio extra para título y márgenes
+                
+                return Math.max(totalHeight, 200); // Mínimo 200px para brackets grandes
+            }
+        }
+
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom + zoomStep, 3); // Máximo 300%
+            applyZoom();
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom - zoomStep, 0.3); // Mínimo 30%
+            applyZoom();
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            const canvas = document.getElementById('canvas');
+            canvas.style.transform = `scale(${currentZoom})`;
+            canvas.style.transformOrigin = 'top left';
+            
+            // Actualizar indicador de zoom
+            document.getElementById('zoom-level').textContent = Math.round(currentZoom * 100) + '%';
+            
+            console.log(`🔍 Zoom aplicado: ${Math.round(currentZoom * 100)}%`);
+        }
+
+        function saveProject() {
+            const projectData = {
+                name: 'Proyecto de Llaves',
+                created: new Date().toISOString(),
+                brackets: brackets,
+                categories: currentData ? currentData.categories : null
+            };
+            
+            const dataStr = JSON.stringify(projectData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `proyecto_llaves_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            console.log('💾 Proyecto guardado');
+        }
+
+        function exportBrackets() {
+            if (brackets.length === 0) {
+                alert('No hay brackets para exportar');
+                return;
+            }
+
+            // Exportar como SVG
+            const canvas = document.getElementById('canvas');
+            const svgData = new XMLSerializer().serializeToString(canvas);
+            
+            const svgBlob = new Blob([svgData], {type: 'image/svg+xml'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(svgBlob);
+            link.download = `brackets_${new Date().toISOString().split('T')[0]}.svg`;
+            link.click();
+            
+            console.log('📤 Brackets exportados como SVG');
+        }
+
+        async function generatePDF() {
+            // Usar categorías directamente para el PDF
+            let dataForPDF = [];
+            
+            if (categories && Object.keys(categories).length > 0) {
+                // Generar PDF con todas las categorías
+                dataForPDF = Object.entries(categories).map(([categoryName, categoryData]) => ({
+                    name: categoryName,
+                    category: categoryName,
+                    participants: categoryData.participants,
+                    type: 'single_elimination'
+                }));
+                console.log(`📄 Generando PDF con ${Object.keys(categories).length} categorías`);
+            } else if (brackets.length > 0) {
+                // Si no hay categorías pero hay brackets en el canvas
+                dataForPDF = brackets.map(bracket => ({
+                    name: bracket.name,
+                    category: bracket.category,
+                    participants: bracket.participants,
+                    type: bracket.type
+                }));
+                console.log(`📄 Generando PDF con ${brackets.length} brackets del canvas`);
+            } else {
+                alert('No hay categorías ni brackets para generar PDF.\n\nPuedes:\n• Importar un archivo Excel\n• Crear categorías con "➕ Agregar Categoría"\n• Añadir brackets manualmente');
+                return;
+            }
+
+            try {
+                showLoading('Generando PDF...');
+                
+                const apiUrl = getApiBaseUrl();
+                const fullUrl = `${apiUrl}/api/generate-pdf`;
+                
+                const pdfData = { brackets: dataForPDF };
+                console.log('📄 Datos para PDF:', JSON.stringify(pdfData, null, 2));
+                console.log(`🔗 URL del API: ${fullUrl}`);
+
+                const response = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(pdfData),
+                    signal: AbortSignal.timeout(120000) // 2 minutos para múltiples categorías
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    
+                    const filename = categories && Object.keys(categories).length > 0 
+                        ? `brackets_categorias_${new Date().toISOString().split('T')[0]}.pdf`
+                        : `brackets_${new Date().toISOString().split('T')[0]}.pdf`;
+                    
+                    link.download = filename;
+                    link.click();
+                    
+                    const source = categories && Object.keys(categories).length > 0 ? 'categorías del torneo' : 'brackets del canvas';
+                    console.log(`📄 PDF generado exitosamente desde ${source}`);
+                } else {
+                    const errorText = await response.text();
+                    console.error(`❌ Error del servidor (${response.status}):`, errorText);
+                    throw new Error(`Error del servidor: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                console.error('❌ Error generando PDF:', error);
+                
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    alert(`Error de conexión con el servidor Flask.\n\n` +
+                          `Asegúrate de que:\n` +
+                          `• El servidor Flask esté corriendo (python app.py)\n` +
+                          `• No haya problemas de firewall\n` +
+                          `• El puerto 5000 esté disponible\n\n` +
+                          `URL intentada: ${getApiBaseUrl()}/api/generate-pdf`);
+                } else if (error.name === 'AbortError') {
+                    alert('La generación del PDF tardó demasiado tiempo. Intenta con menos categorías.');
+                } else {
+                    alert('Error generando PDF: ' + error.message);
+                }
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function testServerConnection() {
+            console.log('🔧 Probando conexión con el servidor Flask...');
+            
+            try {
+                const apiUrl = getApiBaseUrl();
+                const statusUrl = `${apiUrl}/status`;
+                
+                console.log(`🔗 Probando URL: ${statusUrl}`);
+                
+                const response = await fetch(statusUrl, {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(5000) // 5 segundos timeout
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Servidor conectado correctamente:', data);
+                    alert(`✅ Conexión exitosa con el servidor Flask!\n\n` +
+                          `Versión: ${data.version}\n` +
+                          `Estado: ${data.status}\n` +
+                          `URL: ${statusUrl}`);
+                } else {
+                    console.error(`❌ Error del servidor: ${response.status}`);
+                    alert(`❌ El servidor respondió con error: ${response.status}\n\nURL: ${statusUrl}`);
+                }
+            } catch (error) {
+                console.error('❌ Error de conexión:', error);
+                
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    alert(`❌ No se pudo conectar al servidor Flask.\n\n` +
+                          `Soluciones:\n` +
+                          `1. Ejecuta: python app.py\n` +
+                          `2. Verifica que esté en puerto 5000\n` +
+                          `3. Revisa firewall/antivirus\n\n` +
+                          `URL intentada: ${getApiBaseUrl()}/status`);
+                } else if (error.name === 'AbortError') {
+                    alert(`⏰ Timeout de conexión.\n\nEl servidor tardó demasiado en responder.`);
+                } else {
+                    alert(`❌ Error de conexión: ${error.message}`);
+                }
+            }
+        }
+
+        function showFileInfo(fileInfo, detectedColumns) {
+            const fileInfoDiv = document.getElementById('file-info');
+            
+            if (!fileInfo) return;
+            
+            fileInfoDiv.innerHTML = `
+                <h4>✅ ${fileInfo.filename}</h4>
+                <div class="file-info-item">
+                    <span class="file-info-label">Filas originales:</span>
+                    <span class="file-info-value">${fileInfo.original_rows}</span>
+                </div>
+                <div class="file-info-item">
+                    <span class="file-info-label">Participantes KYORUGUI:</span>
+                    <span class="file-info-value">${fileInfo.processed_rows}</span>
+                </div>
+                <div class="file-info-item">
+                    <span class="file-info-label">Columnas detectadas:</span>
+                    <span class="file-info-value">${Object.values(detectedColumns || {}).filter(col => col).length}</span>
+                </div>
+            `;
+            
+            fileInfoDiv.style.display = 'block';
+        }
+
+        function generateBracketsFromCategories(categories) {
+            console.log('🏆 Generando brackets automáticamente desde categorías:', categories);
+
+            // Limpiar brackets existentes
+            brackets = [];
+            clearCanvas();
+
+            let yOffset = 50;
+            const xPosition = 50;
+
+            // Crear un bracket por cada categoría
+            Object.values(categories).forEach((categoryData, index) => {
+                const bracket = {
+                    id: `bracket_${Date.now()}_${index}`,
+                    category: categoryData.name,
+                    participants: categoryData.participants.map(p => ({
+                        name: p.name,
+                        academy: p.academy || ''
+                    })),
+                    position: { x: xPosition, y: yOffset },
+                    type: 'single_elimination'
+                };
+
+                brackets.push(bracket);
+                renderBracket(bracket);
+
+                // Calcular altura para el siguiente bracket
+                const bracketHeight = calculateBracketHeight(bracket);
+                yOffset += bracketHeight + 100; // 100px de espaciado
+            });
+
+            updateBracketCount();
+
+            console.log(`✅ ${brackets.length} brackets generados automáticamente`);
+        }
+
+        function clearCanvas() {
+            const canvas = document.getElementById('canvas');
+            if (canvas) {
+                canvas.innerHTML = '';
+            }
+        }
+
+        // ===== FUNCIONES DEL GESTOR DE HOJAS =====
+
+
+
+        function initializeSheetsFromCategories(categories) {
+            console.log('📄 Inicializando hojas desde categorías:', categories);
+            
+            // Verificar que el contenedor existe
+            const sheetsContainer = document.getElementById('sheets-container');
+            if (!sheetsContainer) {
+                console.error('❌ No se encontró el contenedor de hojas');
+                return;
+            }
+            
+            // Limpiar hojas existentes solo si hay nuevas categorías
+            if (Object.keys(categories).length > 0) {
+                sheets = [];
+                sheetCounter = 0;
+                
+                // Crear una hoja por cada categoría
+                Object.entries(categories).forEach(([categoryName, categoryData], index) => {
+                    console.log(`📄 Creando hoja ${index + 1} para categoría: ${categoryName}`);
+                    createSheetFromCategory(categoryName, categoryData);
+                });
+                
+                // Renderizar hojas y seleccionar la primera
+                renderSheets();
+                
+                // Seleccionar automáticamente la primera hoja
+                if (sheets.length > 0) {
+                    selectSheet(sheets[0].id);
+                }
+                
+                console.log(`✅ ${sheets.length} hojas inicializadas automáticamente`);
+            } else {
+                console.log('⚠️ No hay categorías para inicializar hojas');
+            }
+        }
+
+        function createSheetFromCategory(categoryName, categoryData) {
+            sheetCounter++;
+            const sheet = {
+                id: `sheet_${Date.now()}_${sheetCounter}`,
+                name: `Hoja ${sheetCounter}`,
+                category: categoryName,
+                participants: categoryData.participants.slice(), // Copia de los participantes
+                created: new Date().toISOString()
+            };
+            
+            sheets.push(sheet);
+            return sheet;
+        }
+
+
+
+        function renderSheets() {
+            const container = document.getElementById('sheets-container');
+            
+            if (!container) {
+                console.error('❌ No se encontró el contenedor de hojas para renderizar');
+                return;
+            }
+            
+            console.log(`🔄 Renderizando ${sheets.length} hojas`);
+            
+            if (sheets.length === 0) {
+                container.innerHTML = '<div style="color: #999; font-style: italic; text-align: center; padding: 20px;">No hay hojas creadas</div>';
+                return;
+            }
+
+            container.innerHTML = sheets.map(sheet => `
+                <div class="sheet-item ${sheet.id === activeSheetId ? 'active' : ''}" 
+                     data-sheet-id="${sheet.id}" 
+                     onclick="selectSheet('${sheet.id}')">
+                    <div class="sheet-header">
+                        <div class="sheet-name">${sheet.name}</div>
+                        <div class="sheet-controls">
+                            <button class="sheet-btn" onclick="editSheet('${sheet.id}'); event.stopPropagation();" title="Editar">✏️</button>
+                            <button class="sheet-btn" onclick="duplicateSheet('${sheet.id}'); event.stopPropagation();" title="Duplicar">📋</button>
+                            <button class="sheet-btn" onclick="deleteSheet('${sheet.id}'); event.stopPropagation();" title="Eliminar">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="sheet-category">${sheet.category}</div>
+                    <div class="sheet-participant-count">${sheet.participants.length} participantes</div>
+                </div>
+            `).join('');
+            
+            // Actualizar estado del botón "Añadir Bracket"
+            updateAddBracketButton();
+            
+            console.log(`✅ ${sheets.length} hojas renderizadas correctamente`);
+        }
+
+        function selectSheet(sheetId) {
+            activeSheetId = sheetId;
+            renderSheets();
+            
+            const sheet = sheets.find(s => s.id === sheetId);
+            if (sheet) {
+                // Actualizar el canvas para mostrar solo esta categoría
+                updateCanvasForSheet(sheet);
+                console.log('📄 Hoja seleccionada:', sheet.name);
+            }
+        }
+
+        function updateCanvasForSheet(sheet) {
+            // Limpiar canvas
+            clearCanvas();
+            brackets = [];
+            
+            // Crear bracket para la categoría de la hoja
+            const bracket = {
+                id: `bracket_${Date.now()}`,
+                name: `Bracket - ${sheet.name}`,
+                category: sheet.category,
+                participants: sheet.participants.map(p => ({
+                    name: p.name,
+                    academy: p.academy || ''
+                })),
+                position: { x: 50, y: 50 },
+                type: 'single_elimination'
+            };
+
+            brackets.push(bracket);
+            renderBracket(bracket);
+            updateBracketCount();
+            
+            console.log('🏆 Canvas actualizado para hoja:', sheet.name);
+        }
+
+        function editSheet(sheetId) {
+            const sheet = sheets.find(s => s.id === sheetId);
+            if (!sheet) return;
+
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                min-width: 400px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            `;
+
+            modal.innerHTML = `
+                <h3 style="margin: 0 0 20px 0; color: #222; font-size: 1.2rem;">Editar Hoja</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                        Nombre de la hoja:
+                    </label>
+                    <input type="text" id="edit-sheet-name" value="${sheet.name}" 
+                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                        Categoría:
+                    </label>
+                    <input type="text" value="${sheet.category}" readonly
+                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #f5f5f5; color: #666;">
+                    <small style="color: #666; font-size: 12px;">La categoría no se puede cambiar después de crear la hoja</small>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button id="cancel-edit-sheet" 
+                            style="padding: 10px 20px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Cancelar
+                    </button>
+                    <button id="save-edit-sheet" 
+                            style="padding: 10px 20px; border: none; background: #b89b6a; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Guardar
+                    </button>
+                </div>
+            `;
+
+            const nameInput = modal.querySelector('#edit-sheet-name');
+            const cancelBtn = modal.querySelector('#cancel-edit-sheet');
+            const saveBtn = modal.querySelector('#save-edit-sheet');
+
+            const closeModal = () => overlay.remove();
+
+            const saveChanges = () => {
+                const name = nameInput.value.trim();
+                if (!name) {
+                    alert('El nombre no puede estar vacío');
+                    return;
+                }
+
+                sheet.name = name;
+                renderSheets();
+                closeModal();
+                console.log('✏️ Hoja editada:', sheet.name);
+            };
+
+            cancelBtn.addEventListener('click', closeModal);
+            saveBtn.addEventListener('click', saveChanges);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeModal();
+            });
+
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') saveChanges();
+                if (e.key === 'Escape') closeModal();
+            });
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            setTimeout(() => nameInput.focus(), 100);
+        }
+
+        function duplicateSheet(sheetId) {
+            const sheet = sheets.find(s => s.id === sheetId);
+            if (!sheet) return;
+
+            sheetCounter++;
+            const duplicatedSheet = {
+                id: `sheet_${Date.now()}_${sheetCounter}`,
+                name: `${sheet.name} (Copia)`,
+                category: sheet.category,
+                participants: sheet.participants.slice(), // Copia profunda
+                created: new Date().toISOString()
+            };
+
+            sheets.push(duplicatedSheet);
+            renderSheets();
+            selectSheet(duplicatedSheet.id);
+            
+            console.log('📋 Hoja duplicada:', duplicatedSheet.name);
+        }
+
+        function deleteSheet(sheetId) {
+            const sheet = sheets.find(s => s.id === sheetId);
+            if (!sheet) return;
+
+            if (confirm(`¿Estás seguro de que quieres eliminar la hoja "${sheet.name}"?`)) {
+                const index = sheets.findIndex(s => s.id === sheetId);
+                sheets.splice(index, 1);
+                
+                // Si se eliminó la hoja activa, seleccionar otra
+                if (activeSheetId === sheetId) {
+                    if (sheets.length > 0) {
+                        selectSheet(sheets[0].id);
+                    } else {
+                        activeSheetId = null;
+                        clearCanvas();
+                        brackets = [];
+                        updateBracketCount();
+                    }
+                }
+                
+                renderSheets();
+                console.log('🗑️ Hoja eliminada:', sheet.name);
+            }
+        }
+
+        function clearAllSheets() {
+            if (sheets.length === 0) {
+                alert('No hay hojas para limpiar');
+                return;
+            }
+
+            if (confirm(`¿Estás seguro de que quieres eliminar todas las ${sheets.length} hojas?`)) {
+                sheets = [];
+                activeSheetId = null;
+                sheetCounter = 0;
+                clearCanvas();
+                brackets = [];
+                updateBracketCount();
+                renderSheets();
+                updateAddBracketButton();
+                
+                console.log('🗑️ Todas las hojas eliminadas');
+            }
+        }
+
+
+    </script>
+</body>
+</html>

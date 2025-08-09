@@ -8,4 +8,10 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.7
       - key: PIP_NO_CACHE_DIR
-        value: "1" 
+        value: "1"
+      - key: FLASK_ENV
+        value: "production"
+      - key: SECRET_KEY
+        generateValue: true
+    healthCheckPath: /status
+    autoDeploy: true 
