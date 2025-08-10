@@ -206,6 +206,16 @@ def status():
         'results_folder': app.config['RESULTS_FOLDER']
     })
 
+@app.route('/health')
+def health():
+    """Endpoint de health check alternativo"""
+    return jsonify({'status': 'ok'})
+
+@app.route('/ping')
+def ping():
+    """Endpoint simple de ping"""
+    return 'pong'
+
 # === NUEVAS RUTAS PARA EDITOR VISUAL ===
 
 @app.route('/api/brackets', methods=['GET'])

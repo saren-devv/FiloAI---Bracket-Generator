@@ -40,4 +40,13 @@ else
     pip install -r requirements_binary.txt
 fi
 
-echo "🎉 Build completado exitosamente!" 
+echo "🎉 Build completado exitosamente!"
+
+# Verificar que la aplicación puede iniciar
+echo "🔍 Verificando que la aplicación puede iniciar..."
+python -c "
+import app
+print('✅ App importada correctamente')
+print('✅ Configuración cargada:', app.app.config['UPLOAD_FOLDER'])
+print('✅ Endpoints disponibles:', [rule.rule for rule in app.app.url_map.iter_rules()])
+" 

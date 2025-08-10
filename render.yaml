@@ -3,7 +3,7 @@ services:
     name: filo-torneos
     env: python
     buildCommand: chmod +x build.sh && ./build.sh
-    startCommand: python app.py
+    startCommand: python wsgi.py
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.7
@@ -17,5 +17,5 @@ services:
         value: "0"
       - key: PIP_PREFER_BINARY
         value: "1"
-    healthCheckPath: /status
+    healthCheckPath: /ping
     autoDeploy: true 
